@@ -23,14 +23,14 @@ Now add the alias.
 
 ## Configuration
 
-Run `php artisan config:publish boparaiamrit\facebook` and modify the config file with your own informations.
+Run `php artisan config:publish boparaiamrit/facebook` and modify the config file with your own informations.
 
 
 ## Examples
 
-Get Login Url // helper method to get login url
- for ur app with scope specify
-	Route::get('/', function()
-	{
-		return Facebook::loginUrl();
-	});
+Get Login Url with your credentials and scope.
+
+Route::get('/', function()
+{
+	return Facebook::loginUrl();
+});
