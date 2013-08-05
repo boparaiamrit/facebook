@@ -1,0 +1,21 @@
+{
+    "name": "boparaiamrit/facebook",
+    "description": "Facebook PHP SDK Package for Laravel 4",
+    "keywords": ["Facebook", "laravel", "laravel4"],
+    "authors": [
+        {
+            "name": "boparaiamrit",
+            "email": "boparaiamrit@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0",
+        "illuminate/support": "4.0.x"
+    },
+    "autoload": {
+        "psr-0": {
+            "Boparaiamrit\\Facebook": "src/"
+        }
+    },
+    "minimum-stability": "dev"
+}
