@@ -25,6 +25,34 @@ Now add the alias.
 
 Run `php artisan config:publish boparaiamrit/facebook` and modify the config file with your own informations.
 
+1. AppId => If you donot have appId then get it fromm facebook developer apps.
+2. Secret => Its come with appId.
+3. Redirect => Specify redirect url(its your home page eg http://example.com/) after logged in with facebook.
+4. Logout => When somebody logout from your site, it redirects to logout url.
+5. Scope => These are permission you want from your users.
+
+##Helpers Function
+
+	public function loginUrl(){
+	    $params = array(
+	      'scope' => Config::get('facebook::scope'),
+	      'redirect_uri' => Config::get('facebook::redirect'),
+	    );
+	    return $this->getLoginUrl($params);
+	}
+
+	public function logoutUrl(){
+     $params = array( 'next' => Config::get('facebook::logout'));
+     return $this->getLogoutUrl($params);
+    }
+
+
+    public function logout(){
+     if($this->getUser()){
+       $this->destroySession();
+     }
+    }
+
 
 ## Examples
 
