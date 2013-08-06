@@ -36,21 +36,21 @@ Run `php artisan config:publish boparaiamrit/facebook` and modify the config fil
 
 1. Get Login Url with your credentials and scope.
 
-    Route::get('/', function()
+    `Route::get('/', function()
     {
     	return Facebook::loginUrl();
-    });
+    });`
 
 2. Get User Id
 
-    Route::get('/', function()
+    `Route::get('/', function()
     {
     	return Facebook::getUser();
-    });
+    });`
 
 3. Use facebook API
 
-    Route::get('/', function()
+    `Route::get('/', function()
     {
     	$profile = Facebook::api('/me?fields=id,name,first_name,last_name,username,email,gender,birthday,hometown,location,picture.width(100)');
-    });
+    });`
