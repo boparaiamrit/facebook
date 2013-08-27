@@ -54,3 +54,19 @@ Run `php artisan config:publish boparaiamrit/facebook` and modify the config fil
     {
     	$profile = Facebook::api('/me?fields=id,name,first_name,last_name,username,email,gender,birthday,hometown,location,picture.width(100)');
     });`
+    
+4. Get Logout Url
+
+    `Route::get('/', function()
+    {
+    	return Facebook::logoutUrl();
+    });`
+    
+5. FQL
+    `Route::get('/', function()
+    {
+    	return Facebook::api(array(
+            'method' => 'fql.query',
+            'query' => "SELECT uid, sex, username, birthday, education, work FROM user WHERE uid = me()",
+        ));
+    });`
