@@ -1,5 +1,4 @@
 <?php namespace Boparaiamrit\Facebook;
-use Config;
 
 /**
  * Copyright 2011 Facebook, Inc.
@@ -172,14 +171,14 @@ class Facebook extends BaseFacebook
 
   public function loginUrl(){
     $params = array(
-      'scope' => Config::get('facebook::scope'),
-      'redirect_uri' => Config::get('facebook::redirect'),
+      'scope' => \Config::get('facebook::scope'),
+      'redirect_uri' => \Config::get('facebook::redirect'),
     );
     return $this->getLoginUrl($params);
   }
 
   public function logoutUrl(){
-    $params = array( 'next' => Config::get('facebook::logout'));
+    $params = array( 'next' => \Config::get('facebook::logout'));
     return $this->getLogoutUrl($params);
   }
 
