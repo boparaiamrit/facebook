@@ -1,6 +1,5 @@
 <?php namespace Boparaiamrit\Facebook;
 
-use Config;
 /**
  * Copyright 2011 Facebook, Inc.
  *
@@ -51,6 +50,16 @@ class Facebook extends BaseFacebook
     parent::__construct($config);
     if (!empty($config['sharedSession'])) {
       $this->initSharedSession();
+
+      // re-load the persisted state, since parent
+      // attempted to read out of non-shared cookie 
+      $state = $this->getPersistentData('state');
+      if (!empty($state)) {
+        $this->state = $state;
+      } else {
+        $this->state = null;
+      }
+ 
     }
   }
 
@@ -127,7 +136,9 @@ class Facebook extends BaseFacebook
     }
 
     $session_var_name = $this->constructSessionVariableName($key);
-    unset($_SESSION[$session_var_name]);
+    if (isset($_SESSION[$session_var_name])) {
+      unset($_SESSION[$session_var_name]);
+    }
   }
 
   protected function clearAllPersistentData() {
