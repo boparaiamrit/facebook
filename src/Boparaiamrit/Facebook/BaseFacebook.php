@@ -1,4 +1,4 @@
-<?php namespace Boparaiamrit\Facebook;
+<?php
 /**
  * Copyright 2011 Facebook, Inc.
  *
@@ -27,7 +27,7 @@ if (!function_exists('json_decode')) {
  *
  * @author Naitik Shah <naitik@facebook.com>
  */
-class FacebookApiException extends \Exception
+class FacebookApiException extends Exception
 {
   /**
    * The result from the API server that represents the exception information.
@@ -42,7 +42,10 @@ class FacebookApiException extends \Exception
   public function __construct($result) {
     $this->result = $result;
 
-    $code = isset($result['error_code']) ? $result['error_code'] : 0;
+    $code = 0;
+    if (isset($result['error_code']) && is_int($result['error_code'])) {
+      $code = $result['error_code'];
+    }
 
     if (isset($result['error_description'])) {
       // OAuth 2.0 Draft 10 style
@@ -262,7 +265,7 @@ abstract class BaseFacebook
    *
    * @param string $apiSecret The App Secret
    * @return BaseFacebook
-   * @deprecated
+   * @deprecated Use setAppSecret instead.
    */
   public function setApiSecret($apiSecret) {
     $this->setAppSecret($apiSecret);
@@ -284,7 +287,7 @@ abstract class BaseFacebook
    * Get the App Secret.
    *
    * @return string the App Secret
-   * @deprecated
+   * @deprecated Use getAppSecret instead.
    */
   public function getApiSecret() {
     return $this->getAppSecret();
@@ -320,11 +323,10 @@ abstract class BaseFacebook
   }
 
   /**
-   * DEPRECATED! Please use getFileUploadSupport instead.
-   *
    * Get the file upload support status.
    *
    * @return boolean true if and only if the server supports file upload.
+   * @deprecated Use getFileUploadSupport instead.
    */
   public function useFileUploadSupport() {
     return $this->getFileUploadSupport();
@@ -589,11 +591,15 @@ abstract class BaseFacebook
     return $this->getUrl(
       'www',
       'dialog/oauth',
-      array_merge(array(
-                    'client_id' => $this->getAppId(),
-                    'redirect_uri' => $currentUrl, // possibly overwritten
-                    'state' => $this->state),
-                  $params));
+      array_merge(
+        array(
+          'client_id' => $this->getAppId(),
+          'redirect_uri' => $currentUrl, // possibly overwritten
+          'state' => $this->state,
+          'sdk' => 'php-sdk-'.self::VERSION
+        ),
+        $params
+      ));
   }
 
   /**
@@ -619,24 +625,14 @@ abstract class BaseFacebook
   /**
    * Get a login status URL to fetch the status from Facebook.
    *
-   * The parameters:
-   * - ok_session: the URL to go to if a session is found
-   * - no_session: the URL to go to if the user is not connected
-   * - no_user: the URL to go to if the user is not signed into facebook
-   *
    * @param array $params Provide custom parameters
    * @return string The URL for the logout flow
    */
   public function getLoginStatusUrl($params=array()) {
-    return $this->getUrl(
-      'www',
-      'extern/login_status.php',
+    return $this->getLoginUrl(
       array_merge(array(
-        'api_key' => $this->getAppId(),
-        'no_session' => $this->getCurrentUrl(),
-        'no_user' => $this->getCurrentUrl(),
-        'ok_session' => $this->getCurrentUrl(),
-        'session_version' => 3,
+        'response_type' => 'code',
+        'display' => 'none',
       ), $params)
     );
   }
@@ -732,7 +728,7 @@ abstract class BaseFacebook
    * @return string The application access token, useful for gathering
    *                public information about users and applications.
    */
-  protected function getApplicationAccessToken() {
+  public function getApplicationAccessToken() {
     return $this->appId.'|'.$this->appSecret;
   }
 
@@ -905,7 +901,7 @@ abstract class BaseFacebook
 
     // json_encode all params values that are not strings
     foreach ($params as $key => $value) {
-      if (!is_string($value)) {
+      if (!is_string($value) && !($value instanceof CURLFile)) {
         $params[$key] = json_encode($value);
       }
     }
@@ -962,12 +958,14 @@ abstract class BaseFacebook
 
     curl_setopt_array($ch, $opts);
     $result = curl_exec($ch);
-
-    if (curl_errno($ch) == 60) { // CURLE_SSL_CACERT
+    
+    $errno = curl_errno($ch);
+    // CURLE_SSL_CACERT || CURLE_SSL_CACERT_BADFILE
+    if ($errno == 60 || $errno == 77) {
       self::errorLog('Invalid or no certificate authority found, '.
                      'using bundled information');
       curl_setopt($ch, CURLOPT_CAINFO,
-                  dirname(__FILE__) . '/fb_ca_chain_bundle.crt');
+                  dirname(__FILE__) . DIRECTORY_SEPARATOR . 'fb_ca_chain_bundle.crt');
       $result = curl_exec($ch);
     }
 
@@ -1027,12 +1025,23 @@ abstract class BaseFacebook
     // check sig
     $expected_sig = hash_hmac('sha256', $payload,
                               $this->getAppSecret(), $raw = true);
-    if ($sig !== $expected_sig) {
+
+    if (strlen($expected_sig) !== strlen($sig)) {
       self::errorLog('Bad Signed JSON signature!');
       return null;
     }
 
-    return $data;
+    $result = 0;
+    for ($i = 0; $i < strlen($expected_sig); $i++) {
+      $result |= ord($expected_sig[$i]) ^ ord($sig[$i]);
+    }
+
+    if ($result == 0) {
+      return $data;
+    } else {
+      self::errorLog('Bad Signed JSON signature!');
+      return null;
+    }
   }
 
   /**
@@ -1196,8 +1205,6 @@ abstract class BaseFacebook
     }
     return $this->getHttpHost();
   }
-
-  /**
 
   /**
    * Returns the Current URL, stripping it of known FB parameters that should
