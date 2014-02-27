@@ -6,7 +6,7 @@ Add `boparaiamrit/facebook` to `composer.json`.
 
     "boparaiamrit/facebook": "dev-master"
     
-Run `composer update` to pull down the latest version of Twitter.
+Run `composer update` to pull down the latest version of Facebook.
 
 Now open up `app/config/app.php` and add the service provider to your `providers` array.
 
