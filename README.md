@@ -71,3 +71,7 @@ Run `php artisan config:publish boparaiamrit/facebook` and modify the config fil
             'query' => "SELECT uid, sex, username, birthday, education, work FROM user WHERE uid = me()",
         ));
     });`
+
+@todo
+
+Shifiting FB SDK from 3.2.2 to v4
