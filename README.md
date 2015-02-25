@@ -72,6 +72,5 @@ Run `php artisan config:publish boparaiamrit/facebook` and modify the config fil
         ));
     });`
 
-@todo
-
-Shifiting FB SDK from 3.2.2 to v4
+Please Get New Facebook Package
+https://github.com/SammyK/LaravelFacebookSdk
