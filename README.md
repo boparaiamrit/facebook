@@ -1,5 +1,9 @@
 # Facebook
 
+#Note
+Please Get New Facebook Package
+https://github.com/SammyK/LaravelFacebookSdk
+
 Facebook PHP SDK for Laravel
 
 Add `boparaiamrit/facebook` to `composer.json`.
@@ -71,6 +75,3 @@ Run `php artisan config:publish boparaiamrit/facebook` and modify the config fil
             'query' => "SELECT uid, sex, username, birthday, education, work FROM user WHERE uid = me()",
         ));
     });`
-
-Please Get New Facebook Package
-https://github.com/SammyK/LaravelFacebookSdk
